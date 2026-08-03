@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Optimización de Consultas SQL - Dark Purple</title>
+  
+  <!-- Fuente Poppins y Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Iconos Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --primary-purple: #9333ea;
+      --accent-purple: #c084fc;
+      --bg-gradient: radial-gradient(circle at top left, #1e1b4b 0%, #0f172a 50%, #090d16 100%);
+      --glass-bg: rgba(30, 27, 75, 0.45);
+      --glass-border: rgba(168, 85, 247, 0.2);
+      --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --code-bg: rgba(15, 23, 42, 0.75);
+      --keyword-color: #a855f7; /* Morado neón para keywords SQL */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      color: var(--text-main);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 750px;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 1.5rem 1.75rem;
+      box-shadow: var(--card-shadow);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s forwards ease-out;
+    }
+
+    .card:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(168, 85, 247, 0.5);
+      box-shadow: 0 12px 40px 0 rgba(147, 51, 234, 0.15);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #f3f4f6;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+
+    .badge-danger {
+      background-color: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .badge-success {
+      background-color: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    /* Caja de código */
+    .code-container {
+      position: relative;
+      background: var(--code-bg);
+      border: 1px solid rgba(168, 85, 247, 0.15);
+      border-radius: 12px;
+      padding: 1.25rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      text-align: left;
+      overflow-x: auto;
+      transition: border-color 0.3s ease;
+    }
+
+    .card:hover .code-container {
+      border-color: rgba(168, 85, 247, 0.4);
+    }
+
+    /* Botón interactivo de copiar */
+    .copy-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.8rem;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(147, 51, 234, 0.2);
+      color: var(--accent-purple);
+      border-color: var(--accent-purple);
+    }
+
+    .copy-btn.copied {
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ade80;
+      border-color: #22c55e;
+    }
+
+    /* Sintaxis de código */
+    .keyword {
+      color: var(--keyword-color);
+      font-weight: 600;
+    }
+
+    .identifier {
+      color: #e2e8f0;
+    }
+
+    /* Animaciones */
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Bloque 1: Consulta menos eficiente -->
+    <div class="card">
+      <div class="card-header">
+        <div class="title-group">
+          <i data-lucide="alert-triangle" style="color: #f87171; width: 20px;"></i>
+          <h3 class="title">Consulta menos eficiente</h3>
+          <span class="badge badge-danger">Lenta</span>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this, 'code-1')">
+          <i data-lucide="copy" style="width: 14px;"></i>
+          <span>Copiar</span>
+        </button>
+      </div>
+
+      <div class="code-container" id="code-1">
+        <div><span class="keyword">SELECT</span> <span class="identifier">*</span></div>
+        <div><span class="keyword">FROM</span> <span class="identifier">empleados;</span></div>
+      </div>
+    </div>
+
+    <!-- Bloque 2: Consulta optimizada -->
+    <div class="card">
+      <div class="card-header">
+        <div class="title-group">
+          <i data-lucide="check-circle-2" style="color: #4ade80; width: 20px;"></i>
+          <h3 class="title">Consulta optimizada</h3>
+          <span class="badge badge-success">Optimizada</span>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this, 'code-2')">
+          <i data-lucide="copy" style="width: 14px;"></i>
+          <span>Copiar</span>
+        </button>
+      </div>
+
+      <div class="code-container" id="code-2">
+        <div><span class="keyword">SELECT</span> <span class="identifier">nombre, salario</span></div>
+        <div><span class="keyword">FROM</span> <span class="identifier">empleados;</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Inicializar iconos
+    lucide.createIcons();
+
+    // Función para copiar código al portapapeles
+    function copyCode(button, elementId) {
+      const codeContainer = document.getElementById(elementId);
+      const textToCopy = codeContainer.innerText;
+
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const textSpan = button.querySelector('span');
+        
+        button.classList.add('copied');
+        textSpan.textContent = '¡Copiado!';
+        
+        setTimeout(() => {
+          button.classList.remove('copied');
+          textSpan.textContent = 'Copiar';
+        }, 2000);
+      });
+    }
+  </script>
+
+</body>
+</html>
