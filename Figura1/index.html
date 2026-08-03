@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estructura de Consulta SQL - Animada con Re-play</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --text-color: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 0;
+            overflow-x: hidden;
+        }
+
+        /* Indicador de ayuda en pantalla */
+        .instrucciones {
+            position: fixed;
+            top: 20px;
+            color: rgba(248, 250, 252, 0.5);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            user-select: none;
+        }
+
+        .contenedor {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            perspective: 1000px;
+        }
+
+        /* --- Animación Estilo Látigo / Snap --- */
+        @keyframes whipIn {
+            0% {
+                opacity: 0;
+                transform: translateX(-200%) scaleX(2) rotate(-15deg);
+            }
+            60% {
+                opacity: 1;
+                transform: translateX(30%) scaleX(0.8) rotate(5deg);
+            }
+            80% {
+                transform: translateX(-10%) scaleX(1.05) rotate(-2deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scaleX(1) rotate(0deg);
+            }
+        }
+
+        .bloque {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            padding: 18px 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            width: 380px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5),
+                        0 0 10px rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            opacity: 0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Aplicar animación de entrada mediante clase */
+        .animar .bloque {
+            animation: whipIn 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        .bloque:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.7),
+                        0 0 15px rgba(56, 189, 248, 0.25);
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        /* Retardos escalonados para la animación látigo */
+        .animar .bloque:nth-child(1) { animation-delay: 0.1s; }
+        .animar .bloque:nth-child(3) { animation-delay: 0.3s; }
+        .animar .bloque:nth-child(5) { animation-delay: 0.5s; }
+        .animar .bloque:nth-child(7) { animation-delay: 0.7s; }
+        .animar .bloque:nth-child(9) { animation-delay: 0.9s; }
+        .animar .bloque:nth-child(11) { animation-delay: 1.1s; }
+
+        .icono {
+            font-size: 32px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .texto {
+            font-weight: 600;
+            font-size: 17px;
+            letter-spacing: 0.3px;
+        }
+
+        /* --- Animación Pista de Aterrizaje para Flechas --- */
+        @keyframes runwayLights {
+            0%, 100% {
+                opacity: 0.2;
+                border-top-color: #475569;
+                filter: drop-shadow(0 0 0px transparent);
+                transform: scale(0.9);
+            }
+            50% {
+                opacity: 1;
+                border-top-color: var(--accent-color);
+                filter: drop-shadow(0 0 8px var(--accent-color));
+                transform: scale(1.2);
+            }
+        }
+
+        .flecha-container {
+            padding: 8px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .flecha {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 14px solid #475569;
+        }
+
+        .animar .flecha {
+            animation: runwayLights 1.8s infinite ease-in-out;
+        }
+
+        /* Secuencia de parpadeo estilo pista de aterrizaje */
+        .animar .flecha-container:nth-child(2) .flecha { animation-delay: 0.0s; }
+        .animar .flecha-container:nth-child(4) .flecha { animation-delay: 0.3s; }
+        .animar .flecha-container:nth-child(6) .flecha { animation-delay: 0.6s; }
+        .animar .flecha-container:nth-child(8) .flecha { animation-delay: 0.9s; }
+        .animar .flecha-container:nth-child(10) .flecha { animation-delay: 1.2s; }
+
+    </style>
+</head>
+<body>
+
+    <div class="instrucciones">Presiona <strong>ENTER</strong> para reiniciar la animación</div>
+
+    <!-- Incluimos la clase "animar" para que cargue desde el principio -->
+    <div class="contenedor animar" id="diagrama">
+        <!-- Bloque 1 -->
+        <div class="bloque">
+            <span class="icono">💻</span>
+            <span class="texto">Consulta SQL</span>
+        </div>
+
+        <div class="flecha-container"><div class="flecha"></div></div>
+
+        <!-- Bloque 2 -->
+        <div class="bloque">
+            <span class="icono">🔍</span>
+            <span class="texto">Análisis de Consultas</span>
+        </div>
+
+        <div class="flecha-container"><div class="flecha"></div></div>
+
+        <!-- Bloque 3 -->
+        <div class="bloque">
+            <span class="icono">⚙️</span>
+            <span class="texto">Optimizador de Consultas</span>
+        </div>
+
+        <div class="flecha-container"><div class="flecha"></div></div>
+
+        <!-- Bloque 4 -->
+        <div class="bloque">
+            <span class="icono">📄</span>
+            <span class="texto">Generación de Planes Posibles</span>
+        </div>
+
+        <div class="flecha-container"><div class="flecha"></div></div>
+
+        <!-- Bloque 5 -->
+        <div class="bloque">
+            <span class="icono">💰</span>
+            <span class="texto">Selección del Plan con Menor Costo</span>
+        </div>
+
+        <div class="flecha-container"><div class="flecha"></div></div>
+
+        <!-- Bloque 6 -->
+        <div class="bloque">
+            <span class="icono">☁️</span>
+            <span class="texto">Plan de Ejecución Final</span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                const contenedor = document.getElementById('diagrama');
+                
+                // Remueve la clase para reiniciar los estilos
+                contenedor.classList.remove('animar');
+                
+                // Forzar un "reflow" en el DOM para que el navegador registre la eliminación de la clase
+                void contenedor.offsetWidth;
+                
+                // Vuelve a añadir la clase para activar las animaciones
+                contenedor.classList.add('animar');
+            }
+        });
+    </script>
+
+</body>
+</html>
