@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flujo de Proceso de Optimización</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #f3f4f6;
+            --text-dark: #1e293b;
+            --line-color: #cbd5e1;
+            
+            /* Paleta de colores en degradé para cada etapa */
+            --step-1: #0284c7;
+            --step-2: #0284c7;
+            --step-3: #06b6d4;
+            --step-4: #10b981;
+            --step-5: #22c55e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .instrucciones {
+            position: fixed;
+            top: 25px;
+            color: rgba(248, 250, 252, 0.4);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            user-select: none;
+        }
+
+        /* --- Contenedor Principal --- */
+        .card-container {
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            padding: 60px 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 1100px;
+            width: 100%;
+            position: relative;
+        }
+
+        /* --- Estructura del Timeline Horizontal --- */
+        .process-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Barra gris de fondo que conecta los pasos */
+        .process-flow::before {
+            content: '';
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            right: 50px;
+            height: 16px;
+            background-color: var(--line-color);
+            border-radius: 8px;
+            z-index: -1;
+        }
+
+        /* --- Componente Individual de Paso --- */
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            opacity: 0; /* Para animación de entrada */
+            position: relative;
+        }
+
+        /* --- Forma de Flecha/Puntero de Fondo (Badge) --- */
+        .badge-container {
+            position: relative;
+            width: 110px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 24px;
+        }
+
+        /* Círculo Principal con Icono */
+        .circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            background-clip: padding-box;
+        }
+
+        /* Puntero/Flecha detrás del círculo */
+        .arrow-tail {
+            position: absolute;
+            left: 30px;
+            width: 65px;
+            height: 60px;
+            clip-path: polygon(0% 0%, 70% 0%, 100% 50%, 70% 100%, 0% 100%);
+            z-index: 1;
+        }
+
+        /* Iconos SVG */
+        .circle svg {
+            width: 38px;
+            height: 38px;
+            stroke: #ffffff;
+            fill: none;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Textos de los pasos */
+        .label {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.35;
+            max-width: 160px;
+            padding: 0 5px;
+        }
+
+        /* Colores Específicos por Paso */
+        .step-1 .circle, .step-1 .arrow-tail { background-color: var(--step-1); }
+        .step-1 .label { color: var(--step-1); }
+
+        .step-2 .circle, .step-2 .arrow-tail { background-color: var(--step-2); }
+        .step-2 .label { color: var(--step-2); }
+
+        .step-3 .circle, .step-3 .arrow-tail { background-color: var(--step-3); }
+        .step-3 .label { color: var(--step-3); }
+
+        .step-4 .circle, .step-4 .arrow-tail { background-color: var(--step-4); }
+        .step-4 .label { color: var(--step-4); }
+
+        .step-5 .circle { background-color: var(--step-5); }
+        .step-5 .label { color: var(--step-5); }
+        .step-5 .arrow-tail { display: none; } /* El último paso es circular puro */
+
+        /* --- ANIMACIÓN LÁTIGO (WHIP) --- */
+        @keyframes whipIn {
+            0% {
+                opacity: 0;
+                transform: translateX(-120px) scaleX(1.5) rotate(-8deg);
+            }
+            60% {
+                opacity: 1;
+                transform: translateX(15px) scaleX(0.9) rotate(3deg);
+            }
+            80% {
+                transform: translateX(-5px) scaleX(1.02);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scaleX(1) rotate(0deg);
+            }
+        }
+
+        .animar .step {
+            animation: whipIn 0.75s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        /* Retardos Escalonados */
+        .animar .step-1 { animation-delay: 0.1s; }
+        .animar .step-2 { animation-delay: 0.25s; }
+        .animar .step-3 { animation-delay: 0.4s; }
+        .animar .step-4 { animation-delay: 0.55s; }
+        .animar .step-5 { animation-delay: 0.7s; }
+    </style>
+</head>
+<body>
+
+    <div class="instrucciones">Presiona <strong>ENTER</strong> para reiniciar la animación</div>
+
+    <div class="card-container animar" id="card">
+        <div class="process-flow">
+            
+            <!-- Paso 1 -->
+            <div class="step step-1">
+                <div class="badge-container">
+                    <div class="circle">
+                        <!-- Icono Bombilla / Monitoreo -->
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9 18h6"></path>
+                            <path d="M10 22h4"></path>
+                            <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path>
+                        </svg>
+                    </div>
+                    <div class="arrow-tail"></div>
+                </div>
+                <div class="label">Monitoreo del Sistema</div>
+            </div>
+
+            <!-- Paso 2 -->
+            <div class="step step-2">
+                <div class="badge-container">
+                    <div class="circle">
+                        <!-- Icono Reloj / Cuentas Lentas -->
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <div class="arrow-tail"></div>
+                </div>
+                <div class="label">Identificación de Cuentas Lentas</div>
+            </div>
+
+            <!-- Paso 3 -->
+            <div class="step step-3">
+                <div class="badge-container">
+                    <div class="circle">
+                        <!-- Icono Lápiz / Análisis -->
+                        <svg viewBox="0 0 24 24">
+                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                        </svg>
+                    </div>
+                    <div class="arrow-tail"></div>
+                </div>
+                <div class="label">Análisis del plan de ejecución</div>
+            </div>
+
+            <!-- Paso 4 -->
+            <div class="step step-4">
+                <div class="badge-container">
+                    <div class="circle">
+                        <!-- Icono Lupa / Detección -->
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
+                    <div class="arrow-tail"></div>
+                </div>
+                <div class="label">Detección de Operaciones costosas</div>
+            </div>
+
+            <!-- Paso 5 -->
+            <div class="step step-5">
+                <div class="badge-container">
+                    <div class="circle">
+                        <!-- Icono Ancla / Aplicación u Optimización -->
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="5" r="3"></circle>
+                            <line x1="12" y1="22" x2="12" y2="8"></line>
+                            <path d="M5 12H2a10 10 0 0 0 20 0h-3"></path>
+                        </svg>
+                    </div>
+                    <div class="arrow-tail"></div>
+                </div>
+                <div class="label">Aplicación de Optimizaciones</div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Disparar animación con la tecla ENTER
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const card = document.getElementById('card');
+                card.classList.remove('animar');
+                void card.offsetWidth; // Forzar reflow
+                card.classList.add('animar');
+            }
+        });
+    </script>
+</body>
+</html>
