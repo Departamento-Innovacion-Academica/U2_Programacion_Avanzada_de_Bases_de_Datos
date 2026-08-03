@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Módulo 2 - Conocimientos y Competencias Previas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --accent: #483C9A;
+      --accent-light: #7a6bd9;
+      --accent-glow: rgba(72, 60, 154, 0.5);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-light: rgba(255, 255, 255, 0.15);
+      --radius-lg: 20px;
+      --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      overflow-x: hidden;
+    }
+
+    /* INSTRUCCIÓN FLOTANTE */
+    .floating-instruction {
+      background: rgba(72, 60, 154, 0.25);
+      border: 1px solid var(--accent-light);
+      color: #b3a8ff;
+      padding: 0.6rem 1.4rem;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(72, 60, 154, 0.3);
+      animation: pulse 2.5s infinite ease-in-out;
+      text-align: center;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: translateY(0);
+        box-shadow: 0 4px 20px rgba(72, 60, 154, 0.3);
+      }
+      50% {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(72, 60, 154, 0.6);
+      }
+    }
+
+    /* ENCABEZADO */
+    header {
+      text-align: center;
+      max-width: 900px;
+    }
+
+    header p.intro-text {
+      color: #e2e8f0;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* CONTENEDOR PRINCIPAL / GRID */
+    .container {
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* TARJETAS INTERACTIVAS CON FONDO Y BLUR */
+    .card-btn {
+      background: none;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      height: 210px;
+      cursor: pointer;
+      text-align: left;
+      outline: none;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition-smooth);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.8rem;
+    }
+
+    /* CAPA DE IMAGEN DE FONDO */
+    .card-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      transition: var(--transition-smooth);
+      z-index: 1;
+      filter: blur(0px) brightness(0.5);
+      transform: scale(1);
+    }
+
+    /* CAPA OSCURA DE CUBIERTA PARA LECTURA */
+    .card-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.88) 100%);
+      z-index: 2;
+      transition: var(--transition-smooth);
+    }
+
+    /* CONTENIDO DE LA TARJETA */
+    .card-content {
+      position: relative;
+      z-index: 3;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card-btn h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.4;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--accent-light);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .card-footer span {
+      transition: var(--transition-smooth);
+      display: inline-block;
+    }
+
+    /* EFECTOS AL PASAR EL MOUSE (HOVER) */
+    .card-btn:hover, .card-btn:focus-visible {
+      transform: translateY(-6px);
+      border-color: var(--accent-light);
+      box-shadow: 0 15px 35px var(--accent-glow);
+    }
+
+    .card-btn:hover .card-bg {
+      filter: blur(7px) brightness(0.35);
+      transform: scale(1.1);
+    }
+
+    .card-btn:hover .card-overlay {
+      background: linear-gradient(180deg, rgba(72, 60, 154, 0.2) 0%, rgba(15, 23, 42, 0.95) 100%);
+    }
+
+    .card-btn:hover .card-footer span {
+      transform: translateX(5px);
+    }
+
+    /* VENTANA EMERGENTE (MODAL) */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition-smooth);
+      z-index: 1000;
+      padding: 1.5rem;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: #1e293b;
+      border: 1px solid var(--accent-light);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      max-width: 600px;
+      width: 100%;
+      transform: scale(0.85) translateY(20px);
+      transition: var(--transition-smooth);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 30px var(--accent-glow);
+      position: relative;
+    }
+
+    .modal-overlay.active .modal-box {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1.2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-light);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-smooth);
+    }
+
+    .modal-close:hover {
+      background: var(--accent);
+      color: var(--text-main);
+    }
+
+    .modal-box h2 {
+      font-size: 1.35rem;
+      color: #b3a8ff;
+      margin-bottom: 1rem;
+      padding-right: 2rem;
+      line-height: 1.4;
+    }
+
+    .modal-box p {
+      color: #e2e8f0;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    .modal-hint {
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: right;
+      border-top: 1px solid var(--border-light);
+      padding-top: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- INSTRUCCIÓN FLOTANTE -->
+  <div class="floating-instruction">
+    💡 Haga clic sobre las tarjetas para ampliar la información.
+  </div>
+
+  <!-- TEXTO INTRODUCTORIO -->
+  <header>
+    <p class="intro-text">
+      Para abordar con solvencia los contenidos del Módulo 2, se recomienda que el estudiante cuente con los siguientes conocimientos y competencias previas:
+    </p>
+  </header>
+
+  <!-- REJILLA DE TARJETAS -->
+  <main class="container">
+    <div class="grid-cards">
+
+      <!-- Tarjeta 1 -->
+      <button class="card-btn" onclick="openModal('Comprensión del funcionamiento general de una consulta SQL', 'capacidad para interpretar cómo una consulta recupera información desde una o varias tablas y cómo se aplican filtros y condiciones para obtener resultados específicos.')">
+        <div class="card-bg" style="background-image: url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop');"></div>
+        <div class="card-overlay"></div>
+        <div class="card-content">
+          <h3>Comprensión del funcionamiento general de una consulta SQL</h3>
+          <div class="card-footer">Ampliar información <span>&rarr;</span></div>
+        </div>
+      </button>
+
+      <!-- Tarjeta 2 -->
+      <button class="card-btn" onclick="openModal('Manejo de operaciones de consulta sobre múltiples tablas', 'experiencia utilizando JOIN y otras formas de relacionar información entre tablas para construir consultas que integren datos provenientes de diferentes estructuras.')">
+        <div class="card-bg" style="background-image: url('https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=800&auto=format&fit=crop');"></div>
+        <div class="card-overlay"></div>
+        <div class="card-content">
+          <h3>Manejo de operaciones de consulta sobre múltiples tablas</h3>
+          <div class="card-footer">Ampliar información <span>&rarr;</span></div>
+        </div>
+      </button>
+
+      <!-- Tarjeta 3 -->
+      <button class="card-btn" onclick="openModal('Nociones básicas sobre volumen y organización de datos', 'comprensión de que las bases de datos pueden manejar grandes cantidades de información y que la forma en la que se organizan los datos influye en la eficiencia con la que pueden ser consultados.')">
+        <div class="card-bg" style="background-image: url('https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=800&auto=format&fit=crop');"></div>
+        <div class="card-overlay"></div>
+        <div class="card-content">
+          <h3>Nociones básicas sobre volumen y organización de datos</h3>
+          <div class="card-footer">Ampliar información <span>&rarr;</span></div>
+        </div>
+      </button>
+
+      <!-- Tarjeta 4 -->
+      <button class="card-btn" onclick="openModal('Familiaridad con el uso de herramientas de consulta en un SGBD', 'experiencia ejecutando consultas SQL dentro de un entorno de base de datos y revisando los resultados obtenidos para validar la información recuperada.')">
+        <div class="card-bg" style="background-image: url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=800&auto=format&fit=crop');"></div>
+        <div class="card-overlay"></div>
+        <div class="card-content">
+          <h3>Familiaridad con el uso de herramientas de consulta en un SGBD</h3>
+          <div class="card-footer">Ampliar información <span>&rarr;</span></div>
+        </div>
+      </button>
+
+      <!-- Tarjeta 5 -->
+      <button class="card-btn" onclick="openModal('Capacidad para analizar consultas desde una perspectiva funcional', 'habilidad para revisar consultas SQL e identificar su propósito dentro de un proceso de recuperación o análisis de datos.')">
+        <div class="card-bg" style="background-image: url('https://images.unsplash.com/photo-1516116211223-4258568f1040?q=80&w=800&auto=format&fit=crop');"></div>
+        <div class="card-overlay"></div>
+        <div class="card-content">
+          <h3>Capacidad para analizar consultas desde una perspectiva funcional</h3>
+          <div class="card-footer">Ampliar información <span>&rarr;</span></div>
+        </div>
+      </button>
+
+      <!-- Tarjeta 6 -->
+      <button class="card-btn" onclick="openModal('Interés por comprender el comportamiento del sistema gestor de bases de datos', 'disposición para explorar cómo el motor de la base de datos procesa las consultas y qué factores pueden afectar el tiempo de respuesta en el acceso a la información.')">
+        <div class="card-bg" style="background-image: url('https://images.unsplash.com/photo-1504639725590-34d0984388bd?q=80&w=800&auto=format&fit=crop');"></div>
+        <div class="card-overlay"></div>
+        <div class="card-content">
+          <h3>Interés por comprender el comportamiento del sistema gestor de bases de datos</h3>
+          <div class="card-footer">Ampliar información <span>&rarr;</span></div>
+        </div>
+      </button>
+
+    </div>
+  </main>
+
+  <!-- PANTALLA EMERGENTE / MODAL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOutside(event)">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">&times;</button>
+      <h2 id="modalTitle">Título de la competencia</h2>
+      <p id="modalBody">Descripción detallada...</p>
+      <div class="modal-hint">Presione <strong>Esc</strong> para cerrar</div>
+    </div>
+  </div>
+
+  <script>
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+
+    function openModal(title, text) {
+      modalTitle.innerText = title;
+      modalBody.innerText = text;
+      modalOverlay.classList.add('active');
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('active');
+    }
+
+    function closeModalOnOutside(event) {
+      if (event.target === modalOverlay) {
+        closeModal();
+      }
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && modalOverlay.classList.contains('active')) {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
