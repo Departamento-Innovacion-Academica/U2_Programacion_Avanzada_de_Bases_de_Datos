@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan de Ejecución SQL - Preciso</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-cyan: #38bdf8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .instrucciones {
+            position: fixed;
+            top: 25px;
+            color: rgba(248, 250, 252, 0.4);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            user-select: none;
+        }
+
+        /* --- Contenedor Principal --- */
+        .card-container {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 60px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5),
+                        0 0 20px rgba(56, 189, 248, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            min-width: 680px;
+        }
+
+        .tree-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- Nodos y Alineaciones --- */
+        .node {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-weight: 700;
+            position: relative;
+            opacity: 0; /* Oculto inicialmente para la animación */
+        }
+
+        /* Textos */
+        .node-main {
+            font-size: 32px;
+            color: #fce7f3; /* Ligero tono crema como la imagen original */
+            letter-spacing: 0.5px;
+        }
+
+        .node-sub {
+            font-size: 26px;
+            color: #fce7f3;
+            letter-spacing: 1px;
+        }
+
+        /* Indentaciones precisas en cascada */
+        .level-1 { margin-left: 0; }
+        .level-2 { margin-left: 120px; }
+        .level-3 { margin-left: 210px; }
+        .level-4 { margin-left: 310px; }
+
+        /* Iconos */
+        .icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon svg {
+            width: 32px;
+            height: 32px;
+            stroke: var(--accent-cyan);
+            fill: none;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.5));
+        }
+
+        /* --- CONECTORES (Líneas Curvas y Flechas) --- */
+        /* Para cada nodo hijo generamos el codo L y la flecha */
+        .has-connector::before {
+            content: '';
+            position: absolute;
+            top: -24px;
+            left: -35px;
+            width: 30px;
+            height: 38px;
+            border-left: 2.5px solid var(--accent-cyan);
+            border-bottom: 2.5px solid var(--accent-cyan);
+            border-bottom-left-radius: 12px;
+            box-shadow: -2px 2px 4px rgba(56, 189, 248, 0.3);
+        }
+
+        /* Punta de la flecha */
+        .has-connector::after {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 10px;
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 7px solid var(--accent-cyan);
+            filter: drop-shadow(2px 0 3px rgba(56, 189, 248, 0.5));
+        }
+
+        /* Adjustes finos de conectores individuales si es necesario */
+        .level-2::before { height: 35px; top: -21px; }
+        .level-3::before { height: 32px; top: -18px; }
+        .level-4::before { height: 32px; top: -18px; }
+
+        /* --- ANIMACIÓN ESTILO LÁTIGO (WHIP) --- */
+        @keyframes whipIn {
+            0% {
+                opacity: 0;
+                transform: translateX(-150px) scaleX(1.6) rotate(-5deg);
+            }
+            60% {
+                opacity: 1;
+                transform: translateX(15px) scaleX(0.9) rotate(2deg);
+            }
+            80% {
+                transform: translateX(-5px) scaleX(1.02);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scaleX(1) rotate(0deg);
+            }
+        }
+
+        .animar .node {
+            animation: whipIn 0.75s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        /* Retardos Escalonados */
+        .animar .level-1 { animation-delay: 0.1s; }
+        .animar .level-2 { animation-delay: 0.3s; }
+        .animar .level-3 { animation-delay: 0.5s; }
+        .animar .level-4 { animation-delay: 0.7s; }
+    </style>
+</head>
+<body>
+
+    <div class="instrucciones">Presiona <strong>ENTER</strong> para reproducir animación</div>
+
+    <div class="card-container animar" id="card">
+        <div class="tree-container">
+            <!-- Nivel 1 -->
+            <div class="node level-1">
+                <span class="node-main">Select Statement</span>
+            </div>
+
+            <!-- Nivel 2 -->
+            <div class="node level-2 has-connector">
+                <span class="node-sub">FILTER</span>
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    </svg>
+                </span>
+            </div>
+
+            <!-- Nivel 3 -->
+            <div class="node level-3 has-connector">
+                <span class="node-sub">TABLE ACCESS</span>
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                    </svg>
+                </span>
+            </div>
+
+            <!-- Nivel 4 -->
+            <div class="node level-4 has-connector">
+                <span class="node-sub">EMPLEADOS</span>
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para re-disparar animación con la tecla ENTER
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const card = document.getElementById('card');
+                card.classList.remove('animar');
+                void card.offsetWidth; // Forzar reflow en el DOM
+                card.classList.add('animar');
+            }
+        });
+    </script>
+</body>
+</html>
